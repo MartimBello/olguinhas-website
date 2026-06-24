@@ -1,0 +1,4 @@
+city,name,address,phone,hours_week_pt,hours_week_en,hours_sun_pt,hours_sun_en
+Cascais,Olguinhas Cascais,“Av. Dr. Manuel Ricardo Espírito Santo Silva 60 loja 05, 2745-748 Cascais”,+351 939 514 091,“Seg–Sex · 10h30–19h; Sáb · 10h30–18h”,“Mon–Fri · 10:30am–7pm; Sat · 10:30am–6pm”,Dom · Encerrado,Sun · Closed
+Estoril,Olguinhas Estoril,“R. António Gedeão 102 Store 01, 2645-595 Alcabideche”,+351 911 194 551,“Seg–Sex · 10h30–18h; Sáb · Encerrado”,“Mon–Fri · 10:30am–6pm; Sat · Closed”,Dom · Encerrado,Sun · Closed
+Páteo Bagatela,Olguinhas Páteo Bagatela,“Passeio de Páteo Bagatela, 1250-020 Lisboa”,+351 913 037 472,“Seg–Qua · 11h30–19h; Qui–Sáb · 10h30–19h”,“Mon–Wed · 11:30am–7pm; Thu–Sat · 10:30am–7pm”,Dom · Encerrado,Sun · Closed
