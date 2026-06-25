@@ -11,7 +11,7 @@ type MenuTab = 'weekly' | 'full';
 const CONTENT = {
   pt: {
     nav: { home: 'Início', story: 'A Nossa História', menu: 'Menu', locations: 'Lojas' },
-    header: { order: 'Encomendar' },
+    header: { order: 'Encomendar', onlineStore: 'Loja Online', comingSoon: 'Em breve' },
     hero: {
       eyebrow: 'Comida caseira portuguesa · desde 1987',
       title: 'O sabor de casa, pronto a levar.',
@@ -63,8 +63,7 @@ const CONTENT = {
         'Em Fevereiro de 1987 servimos o nosso primeiro cocktail, a entrada para um negócio de sucesso.',
         'A tradição de servir bem continua até aos dias de hoje.',
         'O segredo? “Amamos o que fazemos, por isso fazemos bem”.',
-        'É com este lema que servimos a comida de casa de muitas pessoas. Temos duas lojas que, além de vasta oferta de congelados, vendem uma média de 10 opções diferentes de pratos em sistema de take-away.',
-        'Se preferir pode almoçar connosco, tanto na Amoreira como em Cascais será recebido num ambiente tranquilo e familiar.',
+        'É com este lema que servimos a comida de casa de muitas pessoas. Temos três lojas que, além de vasta oferta de congelados, vendem uma média de 10 opções diferentes de pratos em sistema de take-away.',
       ],
       quote: 'Cozinhamos como se fosse para a nossa própria família.',
       stats: [
@@ -96,7 +95,7 @@ const CONTENT = {
   },
   en: {
     nav: { home: 'Home', story: 'Our Story', menu: 'Menu', locations: 'Locations' },
-    header: { order: 'Order' },
+    header: { order: 'Order', onlineStore: 'Loja Online', comingSoon: 'Em breve' },
     hero: {
       eyebrow: 'Portuguese home cooking · since 1987',
       title: 'The taste of home, ready to go.',
@@ -299,6 +298,18 @@ export default function OlguinhasApp({ menuCategories, stores, weeklyMenu }: Pro
     borderBottom: '2px solid transparent',
   };
   const navActive: React.CSSProperties = { color: '#2f4a43', borderBottom: '2px solid #4a7366' };
+  const navDisabled: React.CSSProperties = {
+    ...navBase,
+    alignItems: 'center',
+    borderBottom: '2px solid transparent',
+    color: '#9a9f9a',
+    cursor: 'default',
+    display: 'inline-flex',
+    gap: 7,
+    opacity: 0.55,
+    paddingBottom: 4,
+    pointerEvents: 'none',
+  };
 
   const langOn: React.CSSProperties = { cursor: 'pointer', color: '#2f4a43', padding: '2px 4px' };
   const langOff: React.CSSProperties = { cursor: 'pointer', color: '#a99e84', padding: '2px 4px' };
@@ -316,6 +327,12 @@ export default function OlguinhasApp({ menuCategories, stores, weeklyMenu }: Pro
             {navKeys.map(({ key, label }) => (
               <a key={key} onClick={go(key)} style={page === key ? { ...navBase, ...navActive } : navBase}>{label}</a>
             ))}
+            <span className="og-nav-disabled" aria-disabled="true" style={navDisabled}>
+              {t.header.onlineStore}
+              <span style={{ border: `1px solid ${BRAND_MIST_BORDER}`, borderRadius: 999, color: '#6f7c77', fontSize: 10, fontWeight: 900, letterSpacing: '0.08em', padding: '2px 7px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                {t.header.comingSoon}
+              </span>
+            </span>
           </nav>
           <div className="og-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 2, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.04em' }}>
