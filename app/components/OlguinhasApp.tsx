@@ -1,10 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
-import type { MenuCategory, Store } from '@/lib/data';
+import type { MenuCategory, Store, WeeklyMenu } from '@/lib/data';
 
 type Page = 'home' | 'story' | 'menu' | 'locations';
 type Lang = 'pt' | 'en';
+type MenuTab = 'weekly' | 'full';
 
 const CONTENT = {
   pt: {
@@ -13,37 +15,56 @@ const CONTENT = {
     hero: {
       eyebrow: 'Comida caseira portuguesa · desde 1987',
       title: 'O sabor de casa, pronto a levar.',
-      sub: 'Há mais de 35 anos que cozinhamos com receitas de família. Encomende os seus pratos favoritos na sua loja Olguinhas e leve-os para casa, prontos a servir.',
+      sub: 'Há mais de 35 anos que cozinhamos com receitas de família. Todos os dias encontra comida fresca feita em loja, pronta a levar, e também pratos congelados para ter sempre em casa.',
       cta1: 'Ver o menu',
       cta2: 'As nossas lojas',
       imgLabel: '[ foto · mesa de família ]',
       badge: 'Desde',
     },
-    values: ['Receitas de família', 'Ingredientes frescos', 'Cozinhado de raiz, todos os dias'],
+    values: ['Feito fresco todos os dias', 'Cerca de 10 opções por dia', 'Congelados disponíveis'],
     how: {
       eyebrow: 'Simples como comida de casa',
       heading: 'Como funciona',
       steps: [
-        { n: '1', t: 'Escolha os seus pratos', d: 'Veja o nosso menu de sopas, peixe, carne, acompanhamentos e doces.' },
-        { n: '2', t: 'Encomende na loja', d: 'Faça a sua encomenda diretamente na loja, com 48 a 72 horas de antecedência.' },
-        { n: '3', t: 'Leve para casa', d: 'Levante na data combinada, aqueça e sirva. Tão simples como comida de casa.' },
+        { n: '1', t: 'Escolha na loja', d: 'Todos os dias há cerca de 10 opções frescas, feitas em loja e prontas a levar.' },
+        { n: '2', t: 'Leve fresco ou congelado', d: 'Escolha comida fresca para hoje ou pratos congelados para ter sempre à mão.' },
+        { n: '3', t: 'Aqueça e sirva', d: 'Em casa, aqueça e sirva. Tão simples como comida caseira acabada de fazer.' },
       ],
+      customHeading: 'Quer algo personalizado?',
+      customSteps: [
+        { n: '1', t: 'Escolha a loja', d: 'Escolha a loja onde quer levantar a sua encomenda.' },
+        { n: '2', t: 'Ligue com 48h', d: 'Contacte a loja com pelo menos 48h de antecedência para combinar o pedido.' },
+        { n: '3', t: 'Levante na data escolhida', d: 'Passe na loja selecionada no dia combinado.' },
+      ],
+      customCta: 'Ver lojas e contactos',
     },
     featured: { eyebrow: 'O nosso menu', heading: 'Pratos de sempre, cozinhados com tempo', link: 'Ver menu completo' },
     menu: {
       eyebrow: 'A nossa cozinha',
       heading: 'O nosso menu',
-      note: 'As encomendas são feitas diretamente na loja, com 48 a 72 horas de antecedência. O menu pode variar conforme a época e a disponibilidade dos ingredientes. Preços disponíveis na loja.',
+      note: 'Todos os dias temos cerca de 10 opções frescas feitas em loja, prontas a levar. Também há pratos congelados para guardar em casa. Para encomendas maiores ou pratos específicos, contacte a loja com 48 a 72 horas de antecedência. O menu pode variar conforme a época e a disponibilidade dos ingredientes.',
+      weeklyTab: 'Menu semanal',
+      fullTab: 'Menu completo',
+      weeklyHeading: 'Menu semanal',
+      weeklyText: 'Veja as opções frescas preparadas em loja para esta semana. A disponibilidade pode variar ao longo do dia, por isso contacte a loja se quiser confirmar um prato específico.',
+      weeklyUpdated: 'Atualizado em',
+      weeklyUnavailable: 'O menu semanal não está disponível neste momento. Contacte a loja para confirmar as opções frescas de hoje.',
+      weeklyEmpty: 'Sem pratos indicados.',
+      weeklyCta: 'Contactar a loja',
+      fullHeading: 'Menu completo',
+      fullText: 'Esta é a nossa lista completa de pratos. Para saber o que está fresco hoje, fale diretamente com a sua loja.',
     },
     story: {
       eyebrow: 'Desde 1987',
       heading: 'A Nossa História',
       lead: 'Comida portuguesa de sempre, feita com o cuidado de quem cozinha para a sua própria família.',
-      imgLabel1: '[ foto · a cozinha / a fundadora ]',
       paras: [
-        'Tudo começou em 1987, numa pequena cozinha em Cascais, com a vontade de levar a comida portuguesa de sempre a quem não tinha tempo para a cozinhar.',
-        'O que começou como um balcão de pratos do dia tornou-se, ao longo de mais de três décadas, uma cozinha de família para muitas famílias. As receitas mantêm-se as mesmas, passadas de mãos em mãos, cozinhadas com o cuidado de quem cozinha para os seus.',
-        'Hoje somos três lojas — em Cascais, no Estoril e em Lisboa — mas a forma de fazer não mudou: ingredientes frescos, tempo a cozinhar e o sabor genuíno da comida de casa, pronta para levar para a sua mesa.',
+        'A nossa história começa dentro de casa com jantares especiais entre amigos e família.',
+        'Em Fevereiro de 1987 servimos o nosso primeiro cocktail, a entrada para um negócio de sucesso.',
+        'A tradição de servir bem continua até aos dias de hoje.',
+        'O segredo? “Amamos o que fazemos, por isso fazemos bem”.',
+        'É com este lema que servimos a comida de casa de muitas pessoas. Temos duas lojas que, além de vasta oferta de congelados, vendem uma média de 10 opções diferentes de pratos em sistema de take-away.',
+        'Se preferir pode almoçar connosco, tanto na Amoreira como em Cascais será recebido num ambiente tranquilo e familiar.',
       ],
       quote: 'Cozinhamos como se fosse para a nossa própria família.',
       stats: [
@@ -55,18 +76,18 @@ const CONTENT = {
     loc: {
       eyebrow: 'Onde estamos',
       heading: 'As Nossas Lojas',
-      sub: 'Encontre a loja Olguinhas mais perto de si. As encomendas são feitas diretamente em cada loja.',
+      sub: 'Encontre a loja Olguinhas mais perto de si. As encomendas são feitas por telefone ou diretamente em cada loja.',
       phoneLabel: 'Telefone',
       hoursLabel: 'Horário',
-      orderNote: 'Moradas e contactos a confirmar. Para encomendas, contacte a loja com 48 a 72 horas de antecedência.',
+      orderNote: 'Passe pela loja para escolher entre as opções frescas do dia, feitas em loja, ou leve pratos congelados para guardar. Para encomendas maiores, contacte a loja com 48 a 72 horas de antecedência.',
     },
     cta: {
       heading: 'Pronto para encomendar?',
-      sub: 'Visite ou ligue para a sua loja Olguinhas mais próxima e leve o sabor de casa à sua mesa.',
+      sub: 'Visite a sua loja Olguinhas mais próxima para escolher as opções frescas do dia ou pratos congelados para ter sempre em casa.',
       btn: 'Ver as lojas',
     },
     footer: {
-      tagline: 'Comida caseira portuguesa, pronta a levar para casa. Cozinhada de raiz desde 1987.',
+      tagline: 'Comida caseira portuguesa feita fresca todos os dias em loja, com opções prontas a levar e pratos congelados.',
       navTitle: 'Navegação',
       citiesTitle: 'Lojas',
       rights: '© 2026 Olguinhas · Todos os direitos reservados',
@@ -79,33 +100,49 @@ const CONTENT = {
     hero: {
       eyebrow: 'Portuguese home cooking · since 1987',
       title: 'The taste of home, ready to go.',
-      sub: 'For over 35 years we have cooked with family recipes. Order your favourite dishes at your Olguinhas store and take them home, ready to serve.',
+      sub: 'For over 35 years we have cooked with family recipes. Every day you will find fresh food made in store, ready to take home, plus frozen dishes to keep on hand.',
       cta1: 'See the menu',
       cta2: 'Our stores',
       imgLabel: '[ photo · family table ]',
       badge: 'Since',
     },
-    values: ['Family recipes', 'Fresh ingredients', 'Cooked from scratch, every day'],
+    values: ['Made fresh every day', 'Around 10 options daily', 'Frozen dishes available'],
     how: {
       eyebrow: 'As simple as home cooking',
       heading: 'How it works',
       steps: [
-        { n: '1', t: 'Choose your dishes', d: 'Browse our menu of soups, fish, meat, sides and desserts.' },
-        { n: '2', t: 'Order at the store', d: 'Place your order directly at the store, 48 to 72 hours in advance.' },
-        { n: '3', t: 'Take it home', d: 'Pick up on the agreed day, reheat and serve. As simple as home cooking.' },
+        { n: '1', t: 'Choose in store', d: 'Every day there are around 10 fresh options, made in store and ready to go.' },
+        { n: '2', t: 'Take fresh or frozen', d: 'Choose fresh food for today or frozen dishes to keep ready at home.' },
+        { n: '3', t: 'Heat and serve', d: 'At home, heat and serve. As simple as freshly made home cooking.' },
       ],
+      customHeading: 'Want something custom?',
+      customSteps: [
+        { n: '1', t: 'Choose the store', d: 'Choose the store where you want to pick up your order.' },
+        { n: '2', t: 'Call with 48h notice', d: 'Contact the store at least 48h in advance to arrange the order.' },
+        { n: '3', t: 'Pick it up', d: 'Collect it from the selected store on the agreed date.' },
+      ],
+      customCta: 'See stores and contacts',
     },
     featured: { eyebrow: 'Our menu', heading: 'Timeless dishes, slow-cooked with care', link: 'See full menu' },
     menu: {
       eyebrow: 'Our kitchen',
       heading: 'Our menu',
-      note: 'Orders are placed directly at the store, 48 to 72 hours in advance. The menu may vary with the season and ingredient availability. Prices available in store.',
+      note: 'Every day we have around 10 fresh options made in store, ready to go. Frozen dishes are also available to keep at home. For larger orders or specific dishes, contact the store 48 to 72 hours in advance. The menu may vary with the season and ingredient availability.',
+      weeklyTab: 'Weekly menu',
+      fullTab: 'Full menu',
+      weeklyHeading: 'Weekly menu',
+      weeklyText: 'See the fresh in-store options prepared for this week. Availability can change during the day, so contact the store if you want to confirm a specific dish.',
+      weeklyUpdated: 'Updated on',
+      weeklyUnavailable: 'The weekly menu is not available right now. Contact the store to confirm today’s fresh options.',
+      weeklyEmpty: 'No dishes listed.',
+      weeklyCta: 'Contact the store',
+      fullHeading: 'Full menu',
+      fullText: 'This is our full list of dishes. To know what is fresh today, contact your store directly.',
     },
     story: {
       eyebrow: 'Since 1987',
       heading: 'Our Story',
       lead: 'Everyday Portuguese food, made with the care of someone cooking for their own family.',
-      imgLabel1: '[ photo · the kitchen / the founder ]',
       paras: [
         'It all started in 1987, in a small kitchen in Cascais, with a wish to bring everyday Portuguese food to those who had no time to cook it.',
         'What began as a counter of dishes of the day became, over more than three decades, a family kitchen for many families. The recipes remain the same, passed from hand to hand, cooked with the care of someone cooking for their own.',
@@ -121,18 +158,18 @@ const CONTENT = {
     loc: {
       eyebrow: 'Where we are',
       heading: 'Our Stores',
-      sub: 'Find the Olguinhas store nearest you. Orders are placed directly at each store.',
+      sub: 'Find the Olguinhas store nearest you. Orders are placed through the phone or directly at each store.',
       phoneLabel: 'Phone',
       hoursLabel: 'Hours',
-      orderNote: 'Addresses and contacts to be confirmed. For orders, contact the store 48 to 72 hours in advance.',
+      orderNote: 'Visit the store to choose from the fresh daily options made in store, or take frozen dishes home to keep. For larger orders, contact the store 48 to 72 hours in advance.',
     },
     cta: {
       heading: 'Ready to order?',
-      sub: 'Visit or call your nearest Olguinhas store and bring the taste of home to your table.',
+      sub: 'Visit your nearest Olguinhas store to choose the fresh daily options or frozen dishes to keep at home.',
       btn: 'See our stores',
     },
     footer: {
-      tagline: 'Portuguese home cooking, ready to take home. Cooked from scratch since 1987.',
+      tagline: 'Portuguese home cooking made fresh every day in store, with ready-to-go options and frozen dishes.',
       navTitle: 'Navigation',
       citiesTitle: 'Stores',
       rights: '© 2026 Olguinhas · All rights reserved',
@@ -141,36 +178,113 @@ const CONTENT = {
   },
 } as const;
 
-const PLACEHOLDER_BG = 'repeating-linear-gradient(135deg, #d3dbd8, #d3dbd8 13px, #cbd5d0 13px, #cbd5d0 26px)';
+const BRAND_MIST = '#d3dcd9';
+const BRAND_MIST_BORDER = '#c2cdc8';
+const LOGO_ASPECT_RATIO = 1537 / 1656;
+const LOGO_MASK = 'url("/olguinhas_logo.svg") center / contain no-repeat';
+const IMAGE_FALLBACK_SRC = '/images/placeholder.png';
+const CATEGORY_IMAGE_SRC: Record<string, string> = {
+  sopas: '/images/category-sopas.png',
+  bacalhau: '/images/category-bacalhau.png',
+  carne: '/images/category-carne.png',
+  peixe: '/images/category-peixe.png',
+  crepes: '/images/category-crepes.png',
+  pies: '/images/category-pies.png',
+  saladas: '/images/category-saladas.png',
+  acomp: '/images/category-acompanhamentos.png',
+  salgados: '/images/category-salgados.png',
+  vegetariano: '/images/category-vegetariano.png',
+  doces: '/images/category-doces.png',
+};
+const WEEKLY_CATEGORY_LABEL_EN: Record<string, string> = {
+  sopa: 'Soup',
+  carne: 'Meat',
+  peixe: 'Fish',
+  vegetariano: 'Vegetarian',
+  acompanhamento: 'Side',
+};
+const WEEKLY_DAY_LABEL_EN: Record<string, string> = {
+  segunda: 'Monday',
+  terca: 'Tuesday',
+  quarta: 'Wednesday',
+  quinta: 'Thursday',
+  sexta: 'Friday',
+  sabado: 'Saturday',
+  domingo: 'Sunday',
+};
 
-function PlaceholderImg({ label, style }: { label: string; style?: React.CSSProperties }) {
+function weeklyCategoryLabel(key: string, label: string, lang: Lang) {
+  return lang === 'en' ? WEEKLY_CATEGORY_LABEL_EN[key] ?? label : label;
+}
+
+function weeklyDayLabel(day: string, label: string, lang: Lang) {
+  return lang === 'en' ? WEEKLY_DAY_LABEL_EN[day] ?? label : label;
+}
+
+function ImageFrame({ src, alt, priority = false, style }: { src: string; alt: string; priority?: boolean; style?: React.CSSProperties }) {
+  const [imageSrc, setImageSrc] = useState(src);
+
   return (
-    <div style={{ background: PLACEHOLDER_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #c2cdc8', ...style }}>
-      <span style={{ fontFamily: "'Nunito Sans', monospace", fontSize: 13, letterSpacing: '0.08em', color: '#4a7366', background: '#f4eee2', padding: '8px 16px', borderRadius: 999, border: '1px solid #c2cdc8' }}>{label}</span>
+    <div style={{ position: 'relative', background: BRAND_MIST, border: `1px solid ${BRAND_MIST_BORDER}`, ...style }}>
+      <Image
+        src={imageSrc}
+        alt={alt}
+        fill
+        priority={priority}
+        sizes="(max-width: 768px) 100vw, 50vw"
+        onError={() => {
+          if (imageSrc !== IMAGE_FALLBACK_SRC) {
+            setImageSrc(IMAGE_FALLBACK_SRC);
+          }
+        }}
+        style={{ objectFit: 'cover' }}
+      />
     </div>
+  );
+}
+
+function OlguinhasLogo({ color, label = 'Olguinhas', decorative = false, style }: { color: string; label?: string; decorative?: boolean; style?: React.CSSProperties }) {
+  const accessibilityProps = decorative
+    ? { 'aria-hidden': true }
+    : { role: 'img' as const, 'aria-label': label };
+
+  return (
+    <span
+      {...accessibilityProps}
+      style={{
+        display: 'block',
+        aspectRatio: `${LOGO_ASPECT_RATIO}`,
+        backgroundColor: color,
+        mask: LOGO_MASK,
+        WebkitMask: LOGO_MASK,
+        ...style,
+      }}
+    />
   );
 }
 
 interface Props {
   menuCategories: MenuCategory[];
   stores: Store[];
+  weeklyMenu: WeeklyMenu | null;
 }
 
-export default function OlguinhasApp({ menuCategories, stores }: Props) {
+export default function OlguinhasApp({ menuCategories, stores, weeklyMenu }: Props) {
   const [page, setPage] = useState<Page>('home');
   const [lang, setLang] = useState<Lang>('pt');
+  const [menuTab, setMenuTab] = useState<MenuTab>('weekly');
 
   const t = CONTENT[lang];
 
   const go = (p: Page) => () => {
     setPage(p);
-    try { window.scrollTo(0, 0); } catch (_) {}
+    try { window.scrollTo(0, 0); } catch {}
   };
 
   const navKeys: Array<{ key: Page; label: string }> = [
     { key: 'home', label: t.nav.home },
-    { key: 'story', label: t.nav.story },
     { key: 'menu', label: t.nav.menu },
+    { key: 'story', label: t.nav.story },
     { key: 'locations', label: t.nav.locations },
   ];
 
@@ -193,18 +307,17 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f4eee2' }}>
 
       {/* Header */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(244,238,226,0.92)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #d8cdb5' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 86, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 32 }}>
-          <a onClick={go('home')} style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', textDecoration: 'none' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-green.png" alt="Olguinhas" style={{ height: 58, width: 'auto', display: 'block' }} />
+      <header className="og-header" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(244,238,226,0.92)', backdropFilter: 'blur(8px)', borderBottom: `1px solid ${BRAND_MIST}` }}>
+        <div className="og-header-inner" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 86, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 32 }}>
+          <a className="og-logo-link" onClick={go('home')} style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', textDecoration: 'none' }}>
+            <OlguinhasLogo color="#2f4a43" style={{ height: 58, width: 58 * LOGO_ASPECT_RATIO }} />
           </a>
-          <nav style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+          <nav className="og-main-nav" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
             {navKeys.map(({ key, label }) => (
               <a key={key} onClick={go(key)} style={page === key ? { ...navBase, ...navActive } : navBase}>{label}</a>
             ))}
           </nav>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div className="og-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 2, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.04em' }}>
               <span onClick={() => setLang('pt')} style={lang === 'pt' ? langOn : langOff}>PT</span>
               <span style={{ color: '#b9ad93' }}>/</span>
@@ -221,21 +334,19 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
         {page === 'home' && (
           <div>
             {/* Hero */}
-            <section style={{ maxWidth: 1200, margin: '0 auto', padding: '72px 40px 64px', display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: 64, alignItems: 'center' }}>
+            <section className="og-hero" style={{ maxWidth: 1200, margin: '0 auto', padding: '72px 40px 64px', display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: 64, alignItems: 'center' }}>
               <div>
                 <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 22 }}>{t.hero.eyebrow}</div>
-                <h1 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 62, lineHeight: 1.04, letterSpacing: '-0.01em', color: '#2f4a43', margin: '0 0 24px', textWrap: 'balance' as React.CSSProperties['textWrap'] }}>{t.hero.title}</h1>
-                <p style={{ fontSize: 19, lineHeight: 1.62, color: '#586962', maxWidth: '30em', margin: '0 0 36px' }}>{t.hero.sub}</p>
-                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                <h1 className="og-hero-title" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 62, lineHeight: 1.04, letterSpacing: '-0.01em', color: '#2f4a43', margin: '0 0 24px', textWrap: 'balance' as React.CSSProperties['textWrap'] }}>{t.hero.title}</h1>
+                <p style={{ fontSize: 19, lineHeight: 1.62, color: '#586962', maxWidth: '31em', margin: '0 0 36px' }}>{t.hero.sub}</p>
+                <div className="og-button-row" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                   <a onClick={go('menu')} style={{ display: 'inline-flex', alignItems: 'center', background: '#4a7366', color: '#f4eee2', fontWeight: 700, fontSize: 16, padding: '15px 30px', borderRadius: 999, cursor: 'pointer', textDecoration: 'none' }}>{t.hero.cta1}</a>
-                  <a onClick={go('locations')} style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#4a7366', fontWeight: 700, fontSize: 16, padding: '15px 30px', borderRadius: 999, border: '1.5px solid #b6c4be', cursor: 'pointer', textDecoration: 'none' }}>{t.hero.cta2}</a>
+                  <a onClick={go('locations')} style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#4a7366', fontWeight: 700, fontSize: 16, padding: '15px 30px', borderRadius: 999, border: `1.5px solid ${BRAND_MIST_BORDER}`, cursor: 'pointer', textDecoration: 'none' }}>{t.hero.cta2}</a>
                 </div>
               </div>
-              <div style={{ position: 'relative' }}>
-                <div style={{ aspectRatio: '4/5', borderRadius: 14, overflow: 'hidden', background: PLACEHOLDER_BG, border: '1px solid #c2cdc8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontFamily: "'Nunito Sans', monospace", fontSize: 13, letterSpacing: '0.08em', color: '#4a7366', background: '#f4eee2', padding: '8px 16px', borderRadius: 999, border: '1px solid #c2cdc8' }}>{t.hero.imgLabel}</span>
-                </div>
-                <div style={{ position: 'absolute', bottom: -22, left: -22, background: '#fbf8f1', border: '1px solid #d8cdb5', borderRadius: 12, padding: '16px 22px', boxShadow: '0 14px 40px rgba(47,74,67,0.12)' }}>
+              <div className="og-hero-media" style={{ position: 'relative' }}>
+                <ImageFrame src="/images/hero-family-table.png" alt={lang === 'pt' ? 'Comida caseira Olguinhas pronta a levar' : 'Olguinhas home-style food ready to take home'} priority style={{ aspectRatio: '4/5', borderRadius: 14, overflow: 'hidden' }} />
+                <div className="og-hero-badge" style={{ position: 'absolute', bottom: -22, left: -22, background: '#fbf8f1', border: '1px solid #d8cdb5', borderRadius: 12, padding: '16px 22px', boxShadow: '0 14px 40px rgba(47,74,67,0.12)' }}>
                   <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 32, color: '#4a7366', lineHeight: 1 }}>1987</div>
                   <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#8a958f', marginTop: 4 }}>{t.hero.badge}</div>
                 </div>
@@ -244,7 +355,7 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
 
             {/* Values bar */}
             <section style={{ background: '#4a7366', color: '#e7ede9' }}>
-              <div style={{ maxWidth: 1200, margin: '0 auto', padding: '22px 40px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '14px 48px' }}>
+              <div className="og-values-bar" style={{ maxWidth: 1200, margin: '0 auto', padding: '22px 40px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '14px 48px' }}>
                 {t.values.map(v => (
                   <span key={v} style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.06em', display: 'inline-flex', alignItems: 'center', gap: 12 }}>
                     <span style={{ width: 6, height: 6, borderRadius: 999, background: '#c2724f', display: 'inline-block' }} />
@@ -255,12 +366,12 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
             </section>
 
             {/* How it works */}
-            <section style={{ maxWidth: 1200, margin: '0 auto', padding: '84px 40px' }}>
+            <section className="og-section og-how" style={{ maxWidth: 1200, margin: '0 auto', padding: '84px 40px' }}>
               <div style={{ textAlign: 'center', marginBottom: 56 }}>
                 <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 14 }}>{t.how.eyebrow}</div>
-                <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 44, color: '#2f4a43', margin: 0 }}>{t.how.heading}</h2>
+                <h2 className="og-section-heading" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 44, color: '#2f4a43', margin: 0 }}>{t.how.heading}</h2>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
+              <div className="og-step-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
                 {t.how.steps.map(step => (
                   <div key={step.n} style={{ textAlign: 'center', padding: '0 12px' }}>
                     <div style={{ width: 64, height: 64, margin: '0 auto 22px', borderRadius: 999, background: '#f4eee2', border: '1.5px solid #4a7366', color: '#4a7366', fontFamily: "'DM Serif Display', serif", fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{step.n}</div>
@@ -269,45 +380,44 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
                   </div>
                 ))}
               </div>
-            </section>
-
-            {/* Featured categories */}
-            <section style={{ background: '#efe7d6' }}>
-              <div style={{ maxWidth: 1200, margin: '0 auto', padding: '84px 40px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, marginBottom: 48, flexWrap: 'wrap' }}>
-                  <div>
-                    <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 14 }}>{t.featured.eyebrow}</div>
-                    <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 44, color: '#2f4a43', margin: 0, maxWidth: '12em' }}>{t.featured.heading}</h2>
-                  </div>
-                  <a onClick={go('menu')} style={{ fontWeight: 700, fontSize: 15, color: '#4a7366', cursor: 'pointer', borderBottom: '1.5px solid #4a7366', paddingBottom: 3, whiteSpace: 'nowrap' }}>{t.featured.link}</a>
+              <div style={{ margin: '72px auto 0', borderTop: `1px solid ${BRAND_MIST_BORDER}`, paddingTop: 56 }}>
+                <div style={{ textAlign: 'center', marginBottom: 56 }}>
+                  <h2 className="og-section-heading" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 44, color: '#2f4a43', margin: 0 }}>{t.how.customHeading}</h2>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 20 }}>
-                  {menuCategories.map(cat => (
-                    <a key={cat.key} onClick={go('menu')} style={{ display: 'block', cursor: 'pointer', textDecoration: 'none', background: '#fbf8f1', border: '1px solid #e2dac8', borderRadius: 12, overflow: 'hidden' }}>
-                      <div style={{ aspectRatio: '1/1', background: PLACEHOLDER_BG, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontFamily: "'Nunito Sans', monospace", fontSize: 10, letterSpacing: '0.06em', color: '#4a7366', background: '#fbf8f1', padding: '5px 9px', borderRadius: 999 }}>[ {lang === 'pt' ? cat.namePt.toLowerCase() : cat.nameEn.toLowerCase()} ]</span>
-                      </div>
-                      <div style={{ padding: '16px 16px 18px' }}>
-                        <h3 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 21, color: '#2f4a43', margin: '0 0 6px' }}>{lang === 'pt' ? cat.namePt : cat.nameEn}</h3>
-                        <p style={{ fontSize: 13, lineHeight: 1.5, color: '#7a857f', margin: 0 }}>{lang === 'pt' ? cat.descPt : cat.descEn}</p>
-                      </div>
-                    </a>
+                <div className="og-step-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
+                  {t.how.customSteps.map(step => (
+                    <div key={step.n} style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ width: 64, height: 64, margin: '0 auto 22px', borderRadius: 999, background: '#f4eee2', border: '1.5px solid #4a7366', color: '#4a7366', fontFamily: "'DM Serif Display', serif", fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{step.n}</div>
+                      <h3 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 24, color: '#2f4a43', margin: '0 0 12px' }}>{step.t}</h3>
+                      <p style={{ fontSize: 16, lineHeight: 1.6, color: '#6f7c77', margin: 0 }}>{step.d}</p>
+                    </div>
                   ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
+                  <a onClick={go('locations')} style={{ display: 'inline-flex', alignItems: 'center', background: '#4a7366', color: '#f4eee2', fontWeight: 800, fontSize: 16, padding: '14px 30px', borderRadius: 999, cursor: 'pointer', textDecoration: 'none' }}>{t.how.customCta}</a>
                 </div>
               </div>
             </section>
 
-            {/* CTA */}
-            <section style={{ maxWidth: 1200, margin: '0 auto', padding: '92px 40px' }}>
-              <div style={{ background: '#4a7366', borderRadius: 18, padding: '64px 56px', display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 48, alignItems: 'center', color: '#eef2ef' }}>
-                <div>
-                  <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 40, color: '#fff', margin: '0 0 16px', lineHeight: 1.1 }}>{t.cta.heading}</h2>
-                  <p style={{ fontSize: 18, lineHeight: 1.6, color: '#cfdcd6', margin: '0 0 30px', maxWidth: '28em' }}>{t.cta.sub}</p>
-                  <a onClick={go('locations')} style={{ display: 'inline-flex', alignItems: 'center', background: '#f4eee2', color: '#4a7366', fontWeight: 800, fontSize: 16, padding: '15px 32px', borderRadius: 999, cursor: 'pointer', textDecoration: 'none' }}>{t.cta.btn}</a>
+            {/* Featured categories */}
+            <section style={{ background: BRAND_MIST }}>
+              <div className="og-section og-featured" style={{ maxWidth: 1200, margin: '0 auto', padding: '84px 40px' }}>
+                <div className="og-featured-head" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, marginBottom: 48, flexWrap: 'wrap' }}>
+                  <div>
+                    <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 14 }}>{t.featured.eyebrow}</div>
+                    <h2 className="og-section-heading" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 44, color: '#2f4a43', margin: 0, maxWidth: '12em' }}>{t.featured.heading}</h2>
+                  </div>
+                  <a onClick={go('menu')} style={{ fontWeight: 700, fontSize: 15, color: '#4a7366', cursor: 'pointer', borderBottom: '1.5px solid #4a7366', paddingBottom: 3, whiteSpace: 'nowrap' }}>{t.featured.link}</a>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/logo-cream.png" alt="" style={{ width: '100%', maxWidth: 260, opacity: 0.92, marginLeft: 'auto', display: 'block' }} />
+                <div className="og-category-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 20 }}>
+                  {menuCategories.map(cat => (
+                    <a key={cat.key} onClick={go('menu')} style={{ display: 'block', cursor: 'pointer', textDecoration: 'none', background: '#fbf8f1', border: `1px solid ${BRAND_MIST_BORDER}`, borderRadius: 12, overflow: 'hidden' }}>
+                      <ImageFrame src={CATEGORY_IMAGE_SRC[cat.key] ?? IMAGE_FALLBACK_SRC} alt={lang === 'pt' ? cat.namePt : cat.nameEn} style={{ aspectRatio: '1/1', border: 0, borderBottom: `1px solid ${BRAND_MIST_BORDER}` }} />
+                      <div style={{ padding: '16px 16px 18px' }}>
+                        <h3 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 21, color: '#2f4a43', margin: '0 0 6px' }}>{lang === 'pt' ? cat.namePt : cat.nameEn}</h3>
+                      </div>
+                    </a>
+                  ))}
                 </div>
               </div>
             </section>
@@ -317,35 +427,16 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
         {/* ============ OUR STORY ============ */}
         {page === 'story' && (
           <div>
-            <section style={{ maxWidth: 900, margin: '0 auto', padding: '80px 40px 56px', textAlign: 'center' }}>
+            <section className="og-page-intro" style={{ maxWidth: 900, margin: '0 auto', padding: '80px 40px 56px', textAlign: 'center' }}>
               <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 18 }}>{t.story.eyebrow}</div>
-              <h1 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 56, color: '#2f4a43', margin: '0 0 22px', lineHeight: 1.05 }}>{t.story.heading}</h1>
+              <h1 className="og-page-title" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 56, color: '#2f4a43', margin: '0 0 22px', lineHeight: 1.05 }}>{t.story.heading}</h1>
               <p style={{ fontSize: 21, lineHeight: 1.6, color: '#586962', margin: '0 auto', maxWidth: '30em' }}>{t.story.lead}</p>
             </section>
 
-            <section style={{ maxWidth: 1100, margin: '0 auto', padding: '0 40px 24px' }}>
-              <PlaceholderImg label={t.story.imgLabel1} style={{ aspectRatio: '21/9', borderRadius: 16, overflow: 'hidden' }} />
-            </section>
-
-            <section style={{ maxWidth: 760, margin: '0 auto', padding: '56px 40px 24px' }}>
+            <section className="og-story-copy" style={{ maxWidth: 760, margin: '0 auto', padding: '24px 40px 24px' }}>
               {t.story.paras.map((para, i) => (
                 <p key={i} style={{ fontSize: 19, lineHeight: 1.75, color: '#3f4f49', margin: '0 0 28px' }}>{para}</p>
               ))}
-            </section>
-
-            <section style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 40px 40px' }}>
-              <blockquote style={{ fontFamily: "'DM Serif Display', serif", fontStyle: 'italic', fontSize: 38, lineHeight: 1.3, color: '#4a7366', textAlign: 'center', margin: '0 auto', maxWidth: '18em', padding: '32px 0', borderTop: '1px solid #d8cdb5', borderBottom: '1px solid #d8cdb5' }}>{t.story.quote}</blockquote>
-            </section>
-
-            <section style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 40px 96px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-                {t.story.stats.map(stat => (
-                  <div key={stat.l} style={{ background: '#efe7d6', borderRadius: 14, padding: '38px 28px', textAlign: 'center' }}>
-                    <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 52, color: '#4a7366', lineHeight: 1 }}>{stat.v}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7a857f', marginTop: 12 }}>{stat.l}</div>
-                  </div>
-                ))}
-              </div>
             </section>
           </div>
         )}
@@ -353,83 +444,187 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
         {/* ============ MENU ============ */}
         {page === 'menu' && (
           <div>
-            <section style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px 36px' }}>
-              <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 16 }}>{t.menu.eyebrow}</div>
-              <h1 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 56, color: '#2f4a43', margin: '0 0 28px', lineHeight: 1.05 }}>{t.menu.heading}</h1>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', background: '#efe7d6', border: '1px solid #e2dac8', borderRadius: 12, padding: '20px 24px', maxWidth: 760 }}>
-                <span style={{ fontSize: 22, lineHeight: 1 }}>🕐</span>
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: '#586962', margin: 0 }}>{t.menu.note}</p>
+            <section className="og-page-intro og-menu-intro" style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px 40px' }}>
+              <div style={{ textAlign: 'center', marginBottom: 48 }}>
+                <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 16 }}>{t.menu.eyebrow}</div>
+                <h1 className="og-page-title" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 56, color: '#2f4a43', margin: '0 0 20px', lineHeight: 1.05 }}>{t.menu.heading}</h1>
+                <p style={{ fontSize: 16, lineHeight: 1.6, color: '#586962', margin: '0 auto', maxWidth: 760 }}>{t.menu.note}</p>
+              </div>
+              <div className="og-menu-tabs" role="tablist" aria-label={t.menu.heading} style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+                {(['weekly', 'full'] as const).map(tab => {
+                  const active = menuTab === tab;
+
+                  return (
+                    <button
+                      key={tab}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setMenuTab(tab)}
+                      style={{
+                        appearance: 'none',
+                        border: `1.5px solid ${active ? '#4a7366' : BRAND_MIST_BORDER}`,
+                        background: active ? '#4a7366' : '#fbf8f1',
+                        color: active ? '#f4eee2' : '#4a7366',
+                        borderRadius: 999,
+                        padding: '12px 24px',
+                        fontFamily: "'Nunito Sans', sans-serif",
+                        fontWeight: 800,
+                        fontSize: 15,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {tab === 'weekly' ? t.menu.weeklyTab : t.menu.fullTab}
+                    </button>
+                  );
+                })}
               </div>
             </section>
 
-            <section style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 40px 96px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {menuCategories.map(cat => (
-                <div key={cat.key} style={{ border: '1px solid #e2dac8', borderRadius: 14, overflow: 'hidden' }}>
-                  <div style={{ background: '#efe7d6', padding: '22px 32px', borderBottom: '1px solid #e2dac8', display: 'flex', alignItems: 'baseline', gap: 18, flexWrap: 'wrap' }}>
-                    <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 32, color: '#2f4a43', margin: 0 }}>{lang === 'pt' ? cat.namePt : cat.nameEn}</h2>
-                    <span style={{ fontSize: 15, color: '#7a857f', fontStyle: 'italic' }}>{lang === 'pt' ? cat.descPt : cat.descEn}</span>
+            {menuTab === 'weekly' ? (
+              <section className="og-menu-panel" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 40px 96px' }}>
+                <div style={{ background: '#fbf8f1', border: `1px solid ${BRAND_MIST_BORDER}`, borderRadius: 14, padding: '36px 40px', textAlign: 'center' }}>
+                  <h2 className="og-section-heading" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 40, color: '#2f4a43', margin: '0 0 14px' }}>{t.menu.weeklyHeading}</h2>
+                  <p style={{ fontSize: 17, lineHeight: 1.65, color: '#586962', margin: '0 auto 24px', maxWidth: 720 }}>{t.menu.weeklyText}</p>
+                  {weeklyMenu ? (
+                    <div className="og-weekly-menu">
+                      <div className="og-weekly-title" style={{ color: '#4a7366', fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{weeklyMenu.ementa}</div>
+                      {weeklyMenu.ultimaAtualizacao && (
+                        <div className="og-weekly-updated" style={{ color: '#7a857f', fontSize: 13, marginBottom: 28 }}>
+                          {t.menu.weeklyUpdated} {weeklyMenu.ultimaAtualizacao.slice(0, 10)}
+                        </div>
+                      )}
+                      <div className="og-weekly-menu-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 18, textAlign: 'left' }}>
+                        {weeklyMenu.dias.map(day => {
+                          const hasDishes = weeklyMenu.categorias.some(category => (day.pratos[category.key] ?? []).length > 0);
+
+                          return (
+                            <div className="og-weekly-day-card" key={day.dia} style={{ border: `1px solid ${BRAND_MIST_BORDER}`, borderRadius: 12, overflow: 'hidden', background: '#fffaf2' }}>
+                              <div className="og-weekly-day-heading" style={{ background: BRAND_MIST, borderBottom: `1px solid ${BRAND_MIST_BORDER}`, color: '#2f4a43', fontFamily: "'DM Serif Display', serif", fontSize: 26, padding: '16px 20px' }}>
+                                {weeklyDayLabel(day.dia, day.diaLabel, lang)}
+                              </div>
+                              <div className="og-weekly-day-body" style={{ display: 'grid', gap: 16, padding: '18px 20px' }}>
+                                {hasDishes ? weeklyMenu.categorias.map(category => {
+                                  const dishes = day.pratos[category.key] ?? [];
+                                  if (dishes.length === 0) return null;
+
+                                  return (
+                                    <div className="og-weekly-category" key={category.key} style={{ borderTop: `1px solid ${BRAND_MIST}`, paddingTop: 12 }}>
+                                      <div className="og-weekly-category-label" style={{ background: BRAND_MIST, borderRadius: 999, color: '#2f4a43', display: 'inline-flex', fontSize: 14, fontWeight: 900, letterSpacing: '0.06em', marginBottom: 10, padding: '5px 12px', textTransform: 'uppercase' }}>
+                                        {weeklyCategoryLabel(category.key, category.label, lang)}
+                                      </div>
+                                      <ul className="og-weekly-dish-list" style={{ display: 'grid', gap: 0, listStyle: 'none', margin: 0, padding: 0 }}>
+                                        {dishes.map(dish => (
+                                          <li className="og-weekly-dish" key={dish} style={{ color: '#2f4a43', fontSize: 15, fontWeight: 700, lineHeight: 1.45, padding: '7px 0 7px 12px', borderLeft: `3px solid ${BRAND_MIST}` }}>{dish}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  );
+                                }) : (
+                                  <p style={{ color: '#7a857f', fontSize: 15, margin: 0 }}>{t.menu.weeklyEmpty}</p>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ background: BRAND_MIST, border: `1px solid ${BRAND_MIST_BORDER}`, borderRadius: 10, color: '#3f4f49', fontSize: 15, lineHeight: 1.6, margin: '0 auto 26px', maxWidth: 680, padding: '16px 20px' }}>{t.menu.weeklyUnavailable}</div>
+                  )}
+                  <a onClick={go('locations')} style={{ display: 'inline-flex', alignItems: 'center', background: '#4a7366', color: '#f4eee2', fontWeight: 800, fontSize: 15, marginTop: 28, padding: '12px 26px', borderRadius: 999, cursor: 'pointer', textDecoration: 'none' }}>{t.menu.weeklyCta}</a>
+                </div>
+              </section>
+            ) : (
+              <section className="og-menu-panel og-full-menu" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 40px 96px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ borderBottom: `1px solid ${BRAND_MIST_BORDER}`, paddingBottom: 42, marginBottom: 28 }}>
+                  <div style={{ textAlign: 'center', marginBottom: 42 }}>
+                    <h2 className="og-section-heading" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 38, color: '#2f4a43', margin: 0 }}>{t.how.customHeading}</h2>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                    {cat.items.map((dish, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 32px', background: Math.floor(i / 2) % 2 === 0 ? '#fbf8f1' : '#f4eee2', borderBottom: i < cat.items.length - (cat.items.length % 2 === 0 ? 2 : 1) ? '1px solid #ede8de' : 'none', borderRight: i % 2 === 0 ? '1px solid #e2dac8' : 'none' }}>
-                        <span style={{ fontSize: 16, fontWeight: 600, color: '#2f4a43' }}>{lang === 'pt' ? dish.namePt : dish.nameEn}</span>
-                        <span style={{ flex: 1 }} />
-                        {dish.tag && <span style={{ fontSize: 12, color: '#a07a4f', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{dish.tag}</span>}
+                  <div className="og-step-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
+                    {t.how.customSteps.map(step => (
+                      <div key={step.n} style={{ textAlign: 'center', padding: '0 12px' }}>
+                        <div style={{ width: 64, height: 64, margin: '0 auto 22px', borderRadius: 999, background: '#f4eee2', border: '1.5px solid #4a7366', color: '#4a7366', fontFamily: "'DM Serif Display', serif", fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{step.n}</div>
+                        <h3 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 24, color: '#2f4a43', margin: '0 0 12px' }}>{step.t}</h3>
+                        <p style={{ fontSize: 16, lineHeight: 1.6, color: '#6f7c77', margin: 0 }}>{step.d}</p>
                       </div>
                     ))}
                   </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: 36 }}>
+                    <a onClick={go('locations')} style={{ display: 'inline-flex', alignItems: 'center', background: '#4a7366', color: '#f4eee2', fontWeight: 800, fontSize: 16, padding: '14px 30px', borderRadius: 999, cursor: 'pointer', textDecoration: 'none' }}>{t.how.customCta}</a>
+                  </div>
                 </div>
-              ))}
-            </section>
+                <div style={{ textAlign: 'center', marginBottom: 28 }}>
+                  <h2 className="og-section-heading" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 44, color: '#2f4a43', margin: '0 0 12px' }}>{t.menu.fullHeading}</h2>
+                  <p style={{ fontSize: 16, lineHeight: 1.6, color: '#586962', margin: '0 auto', maxWidth: 680 }}>{t.menu.fullText}</p>
+                </div>
+                {menuCategories.map(cat => (
+                  <div className="og-menu-category" key={cat.key} style={{ border: `1px solid ${BRAND_MIST_BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
+                    <div style={{ background: BRAND_MIST, padding: '22px 32px', borderBottom: `1px solid ${BRAND_MIST_BORDER}`, display: 'flex', alignItems: 'baseline', gap: 18, flexWrap: 'wrap' }}>
+                      <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 32, color: '#2f4a43', margin: 0 }}>{lang === 'pt' ? cat.namePt : cat.nameEn}</h2>
+                    </div>
+                    <div className="og-dish-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                      {cat.items.map((dish, i) => (
+                        <div className="og-dish-row" key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 32px', background: Math.floor(i / 2) % 2 === 0 ? '#fbf8f1' : '#f4eee2', borderBottom: i < cat.items.length - (cat.items.length % 2 === 0 ? 2 : 1) ? `1px solid ${BRAND_MIST}` : 'none', borderRight: i % 2 === 0 ? `1px solid ${BRAND_MIST_BORDER}` : 'none' }}>
+                          <span style={{ fontSize: 16, fontWeight: 600, color: '#2f4a43' }}>{lang === 'pt' ? dish.namePt : dish.nameEn}</span>
+                          <span style={{ flex: 1 }} />
+                          {dish.tag && <span style={{ fontSize: 12, color: '#a07a4f', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{dish.tag}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </section>
+            )}
 
-            <section style={{ maxWidth: 1100, margin: '0 auto', padding: '0 40px 96px' }}>
-              <div style={{ background: '#4a7366', borderRadius: 16, padding: 48, textAlign: 'center', color: '#eef2ef' }}>
-                <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 34, color: '#fff', margin: '0 0 14px' }}>{t.cta.heading}</h2>
-                <p style={{ fontSize: 17, color: '#cfdcd6', margin: '0 0 26px' }}>{t.cta.sub}</p>
-                <a onClick={go('locations')} style={{ display: 'inline-flex', alignItems: 'center', background: '#f4eee2', color: '#4a7366', fontWeight: 800, fontSize: 16, padding: '14px 30px', borderRadius: 999, cursor: 'pointer', textDecoration: 'none' }}>{t.cta.btn}</a>
-              </div>
-            </section>
+
           </div>
         )}
 
         {/* ============ LOCATIONS ============ */}
         {page === 'locations' && (
           <div>
-            <section style={{ maxWidth: 900, margin: '0 auto', padding: '80px 40px 48px', textAlign: 'center' }}>
+            <section className="og-page-intro" style={{ maxWidth: 900, margin: '0 auto', padding: '80px 40px 48px', textAlign: 'center' }}>
               <div style={{ fontFamily: "'Nunito Sans', sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4a7366', marginBottom: 18 }}>{t.loc.eyebrow}</div>
-              <h1 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 56, color: '#2f4a43', margin: '0 0 22px', lineHeight: 1.05 }}>{t.loc.heading}</h1>
+              <h1 className="og-page-title" style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 56, color: '#2f4a43', margin: '0 0 22px', lineHeight: 1.05 }}>{t.loc.heading}</h1>
               <p style={{ fontSize: 20, lineHeight: 1.6, color: '#586962', margin: '0 auto', maxWidth: '32em' }}>{t.loc.sub}</p>
             </section>
 
-            <section style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 40px 96px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }}>
+            <section className="og-stores-section" style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 40px 96px' }}>
+              <div className="og-store-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }}>
                 {stores.map(store => (
-                  <div key={store.city} style={{ background: '#fbf8f1', border: '1px solid #e2dac8', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ aspectRatio: '3/2', background: PLACEHOLDER_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #e2dac8' }}>
-                      <span style={{ fontFamily: "'Nunito Sans', monospace", fontSize: 11, letterSpacing: '0.06em', color: '#4a7366', background: '#fbf8f1', padding: '6px 12px', borderRadius: 999, border: '1px solid #c2cdc8' }}>[ foto · loja {store.city} ]</span>
-                    </div>
-                    <div style={{ padding: '26px 26px 28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div key={store.city} style={{ background: '#fbf8f1', border: `1px solid ${BRAND_MIST_BORDER}`, borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <div className="og-store-card-body" style={{ padding: '26px 26px 28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                       <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 28, color: '#2f4a43', margin: '0 0 4px' }}>{store.city}</h2>
                       <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#a07a4f', marginBottom: 20 }}>{store.name}</div>
                       <div style={{ fontSize: 15, lineHeight: 1.55, color: '#4f5f59', marginBottom: 18 }}>{store.address}</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 9, fontSize: 15, color: '#4f5f59', paddingTop: 18, borderTop: '1px solid #e2dac8', marginTop: 'auto' }}>
-                        <div style={{ display: 'flex', gap: 10 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 9, fontSize: 15, color: '#4f5f59', paddingTop: 18, borderTop: `1px solid ${BRAND_MIST}`, marginTop: 'auto' }}>
+                        <div className="og-store-info-row" style={{ display: 'flex', gap: 10 }}>
                           <span style={{ color: '#4a7366', fontWeight: 800, minWidth: 64 }}>{t.loc.phoneLabel}</span>
-                          <span style={{ fontWeight: 700, color: '#2f4a43' }}>{store.phone}</span>
+                          <a href={`tel:${store.phone.replace(/\s/g, '')}`} style={{ fontWeight: 700, color: '#2f4a43', textDecoration: 'none' }}>{store.phone}</a>
                         </div>
-                        <div style={{ display: 'flex', gap: 10 }}>
+                        <div className="og-store-info-row" style={{ display: 'flex', gap: 10 }}>
                           <span style={{ color: '#4a7366', fontWeight: 800, minWidth: 64 }}>{t.loc.hoursLabel}</span>
-                          <span>{lang === 'pt' ? store.hoursWeekPt : store.hoursWeekEn}<br />{lang === 'pt' ? store.hoursSunPt : store.hoursSunEn}</span>
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, border: `1px solid ${BRAND_MIST}`, borderRadius: 8, overflow: 'hidden', background: '#fffaf2' }}>
+                            {store.schedule.map((day, dayIndex) => {
+                              const hours = lang === 'pt' ? day.hoursPt : day.hoursEn;
+                              const closed = hours.toLowerCase() === 'encerrado' || hours.toLowerCase() === 'closed';
+
+                              return (
+                                <div className="og-schedule-row" key={day.dayEn} style={{ display: 'grid', gridTemplateColumns: '82px 1fr', gap: 10, padding: '7px 10px', borderBottom: dayIndex < store.schedule.length - 1 ? `1px solid ${BRAND_MIST}` : 'none', alignItems: 'baseline' }}>
+                                  <span style={{ color: '#4a7366', fontWeight: 800, fontSize: 13 }}>{lang === 'pt' ? day.dayPt : day.dayEn}</span>
+                                  <span style={{ color: closed ? '#9a8f7f' : '#2f4a43', fontWeight: closed ? 600 : 700, fontSize: 13 }}>{hours}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: '#efe7d6', border: '1px solid #e2dac8', borderRadius: 12, padding: '20px 24px', marginTop: 32, maxWidth: 760 }}>
-                <span style={{ fontSize: 20, lineHeight: 1 }}>📍</span>
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: '#586962', margin: 0 }}>{t.loc.orderNote}</p>
-              </div>
+
             </section>
           </div>
         )}
@@ -438,10 +633,9 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
 
       {/* Footer */}
       <footer style={{ background: '#2f4a43', color: '#b9c9c2', marginTop: 'auto' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '64px 40px 32px', display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 48 }}>
+        <div className="og-footer-grid" style={{ maxWidth: 1200, margin: '0 auto', padding: '64px 40px 32px', display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 48 }}>
           <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-cream.png" alt="Olguinhas" style={{ height: 78, width: 'auto', display: 'block', marginBottom: 18, opacity: 0.95 }} />
+            <OlguinhasLogo color="#f4eee2" style={{ height: 78, width: 78 * LOGO_ASPECT_RATIO, marginBottom: 18, opacity: 0.95 }} />
             <p style={{ fontSize: 15, lineHeight: 1.6, color: '#93a8a0', margin: 0, maxWidth: '24em' }}>{t.footer.tagline}</p>
           </div>
           <div>
@@ -461,7 +655,7 @@ export default function OlguinhasApp({ menuCategories, stores }: Props) {
             </div>
           </div>
         </div>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 40px', borderTop: '1px solid #3e5a52', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div className="og-footer-bottom" style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 40px', borderTop: '1px solid #3e5a52', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <span style={{ fontSize: 13, color: '#7a948b' }}>{t.footer.rights}</span>
           <span style={{ fontSize: 13, color: '#7a948b', fontStyle: 'italic' }}>{t.footer.slogan}</span>
         </div>
