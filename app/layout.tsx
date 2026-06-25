@@ -19,7 +19,7 @@ const nunitoSans = Nunito_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Olguinhas · Comida Caseira Portuguesa',
+  title: 'Olguinhas · Takeaway',
   description: 'Comida caseira portuguesa feita fresca todos os dias em loja, com cerca de 10 opções prontas a levar e pratos congelados. Lojas em Cascais, Estoril e Lisboa.',
 };
 
