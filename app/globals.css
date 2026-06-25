@@ -212,7 +212,8 @@ button, a {
     gap: 18px !important;
   }
 
-  .og-main-nav a {
+  .og-main-nav a,
+  .og-nav-disabled {
     font-size: 14px !important;
   }
 
