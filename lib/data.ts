@@ -22,10 +22,69 @@ export interface Store {
   name: string;
   address: string;
   phone: string;
-  hoursWeekPt: string;
-  hoursWeekEn: string;
-  hoursSunPt: string;
-  hoursSunEn: string;
+  schedule: StoreScheduleDay[];
+}
+
+export interface StoreScheduleDay {
+  dayPt: string;
+  dayEn: string;
+  hoursPt: string;
+  hoursEn: string;
+}
+
+export interface WeeklyMenuCategory {
+  key: string;
+  label: string;
+}
+
+export interface WeeklyMenuDay {
+  dia: string;
+  diaLabel: string;
+  pratos: Record<string, string[]>;
+}
+
+export interface WeeklyMenu {
+  ementa: string;
+  dataReferencia: string;
+  ultimaAtualizacao: string;
+  categorias: WeeklyMenuCategory[];
+  dias: WeeklyMenuDay[];
+}
+
+const WEEKLY_MENU_ENDPOINT = 'https://central.olguinhas.pt/api/ementa/menu-da-semana';
+
+function isWeeklyMenu(data: unknown): data is WeeklyMenu {
+  if (!data || typeof data !== 'object') return false;
+
+  const menu = data as Partial<WeeklyMenu>;
+  return (
+    typeof menu.ementa === 'string' &&
+    typeof menu.dataReferencia === 'string' &&
+    typeof menu.ultimaAtualizacao === 'string' &&
+    Array.isArray(menu.categorias) &&
+    Array.isArray(menu.dias)
+  );
+}
+
+export async function getWeeklyMenu(): Promise<WeeklyMenu | null> {
+  try {
+    const response = await fetch(WEEKLY_MENU_ENDPOINT, {
+      next: { revalidate: 30 * 60 },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data: unknown = await response.json();
+    if (!isWeeklyMenu(data)) {
+      return null;
+    }
+
+    return data;
+  } catch {
+    return null;
+  }
 }
 
 export function getMenuCategories(): MenuCategory[] {
@@ -60,6 +119,15 @@ export function getStores(): Store[] {
   const filePath = path.join(process.cwd(), 'data', 'stores.csv');
   const content = fs.readFileSync(filePath, 'utf-8');
   const rows = parseCSV(content).slice(1);
+  const days = [
+    { dayPt: 'Segunda', dayEn: 'Monday' },
+    { dayPt: 'Terça', dayEn: 'Tuesday' },
+    { dayPt: 'Quarta', dayEn: 'Wednesday' },
+    { dayPt: 'Quinta', dayEn: 'Thursday' },
+    { dayPt: 'Sexta', dayEn: 'Friday' },
+    { dayPt: 'Sábado', dayEn: 'Saturday' },
+    { dayPt: 'Domingo', dayEn: 'Sunday' },
+  ];
 
   return rows
     .filter(row => row[0]?.trim())
@@ -68,9 +136,10 @@ export function getStores(): Store[] {
       name: row[1]?.trim() ?? '',
       address: row[2]?.trim() ?? '',
       phone: row[3]?.trim() ?? '',
-      hoursWeekPt: row[4]?.trim() ?? '',
-      hoursWeekEn: row[5]?.trim() ?? '',
-      hoursSunPt: row[6]?.trim() ?? '',
-      hoursSunEn: row[7]?.trim() ?? '',
+      schedule: days.map((day, index) => ({
+        ...day,
+        hoursPt: row[4 + index]?.trim() ?? '',
+        hoursEn: row[11 + index]?.trim() ?? '',
+      })),
     }));
 }

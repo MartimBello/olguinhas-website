@@ -20,7 +20,7 @@ const nunitoSans = Nunito_Sans({
 
 export const metadata: Metadata = {
   title: 'Olguinhas · Comida Caseira Portuguesa',
-  description: 'Comida caseira portuguesa, pronta a levar para casa. Cozinhada de raiz desde 1987. Lojas em Cascais, Estoril e Lisboa.',
+  description: 'Comida caseira portuguesa feita fresca todos os dias em loja, com cerca de 10 opções prontas a levar e pratos congelados. Lojas em Cascais, Estoril e Lisboa.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
