@@ -220,6 +220,16 @@ function weeklyDayLabel(day: string, label: string, lang: Lang) {
   return lang === 'en' ? WEEKLY_DAY_LABEL_EN[day] ?? label : label;
 }
 
+function formatMenuPrice(price: string, unit: string) {
+  if (!price) return '';
+
+  const formattedPrice = price.replace('.', ',').replace('€', ' €');
+  const normalizedUnit = unit.trim().toUpperCase();
+  const unitLabel = normalizedUnit === 'KG' ? 'kg' : normalizedUnit === 'L' ? 'L' : normalizedUnit === 'UNI' ? 'un.' : normalizedUnit.toLowerCase();
+
+  return unitLabel ? `${formattedPrice}/${unitLabel}` : formattedPrice;
+}
+
 function ImageFrame({ src, alt, priority = false, style }: { src: string; alt: string; priority?: boolean; style?: React.CSSProperties }) {
   const [imageSrc, setImageSrc] = useState(src);
 
@@ -581,13 +591,17 @@ export default function OlguinhasApp({ menuCategories, stores, weeklyMenu }: Pro
                       <h2 style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400, fontSize: 32, color: '#2f4a43', margin: 0 }}>{lang === 'pt' ? cat.namePt : cat.nameEn}</h2>
                     </div>
                     <div className="og-dish-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                      {cat.items.map((dish, i) => (
-                        <div className="og-dish-row" key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 32px', background: Math.floor(i / 2) % 2 === 0 ? '#fbf8f1' : '#f4eee2', borderBottom: i < cat.items.length - (cat.items.length % 2 === 0 ? 2 : 1) ? `1px solid ${BRAND_MIST}` : 'none', borderRight: i % 2 === 0 ? `1px solid ${BRAND_MIST_BORDER}` : 'none' }}>
-                          <span style={{ fontSize: 16, fontWeight: 600, color: '#2f4a43' }}>{lang === 'pt' ? dish.namePt : dish.nameEn}</span>
-                          <span style={{ flex: 1 }} />
-                          {dish.tag && <span style={{ fontSize: 12, color: '#a07a4f', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{dish.tag}</span>}
-                        </div>
-                      ))}
+                      {cat.items.map((dish, i) => {
+                        const price = formatMenuPrice(dish.price, dish.priceUnit);
+
+                        return (
+                          <div className="og-dish-row" key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 32px', background: Math.floor(i / 2) % 2 === 0 ? '#fbf8f1' : '#f4eee2', borderBottom: i < cat.items.length - (cat.items.length % 2 === 0 ? 2 : 1) ? `1px solid ${BRAND_MIST}` : 'none', borderRight: i % 2 === 0 ? `1px solid ${BRAND_MIST_BORDER}` : 'none' }}>
+                            <span style={{ color: '#2f4a43', flex: '1 1 auto', fontSize: 16, fontWeight: 600, minWidth: 0, overflowWrap: 'anywhere' }}>{lang === 'pt' ? dish.namePt : dish.nameEn}</span>
+                            {dish.tag && <span style={{ fontSize: 12, color: '#a07a4f', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{dish.tag}</span>}
+                            {price && <span className="og-dish-price" style={{ color: '#4a7366', flex: '0 0 auto', fontSize: 14, fontWeight: 900, whiteSpace: 'nowrap' }}>{price}</span>}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}

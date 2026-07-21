@@ -6,6 +6,8 @@ export interface MenuItem {
   namePt: string;
   nameEn: string;
   tag: string;
+  price: string;
+  priceUnit: string;
 }
 
 export interface MenuCategory {
@@ -96,7 +98,7 @@ export function getMenuCategories(): MenuCategory[] {
 
   for (const row of rows) {
     if (row.length < 7) continue;
-    const [key, namePt, nameEn, descPt, descEn, itemPt, itemEn, tag = ''] = row;
+    const [key, namePt, nameEn, descPt, descEn, itemPt, itemEn, tag = '', price = '', priceUnit = ''] = row;
     if (!key?.trim()) continue;
 
     if (!catMap.has(key)) {
@@ -108,6 +110,8 @@ export function getMenuCategories(): MenuCategory[] {
         namePt: itemPt,
         nameEn: itemEn || itemPt,
         tag: tag?.trim() || '',
+        price: price?.trim() || '',
+        priceUnit: priceUnit?.trim() || '',
       });
     }
   }
